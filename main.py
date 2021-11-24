@@ -1,19 +1,21 @@
 from app import file, soup
+import os
 import requests
 
 
 def main():
-    url = 'https://www.nosorigines.qc.ca/GenealogieQuebec.aspx?pid=26378'
-    # url = 'https://www.google.ca/'
+    pid = '26378'
+    url = f'https://www.nosorigines.qc.ca/GenealogieQuebec.aspx?pid={pid}'
+    file_ = f'data/{pid}.htm'
     encoding = 'windows-1252'
-    file_ = 'data/26378.htm'
 
-    # Crawl
-    # response = requests.get(url)
-    # string = response.content.decode(encoding)
+    if not os.path.isfile(file_):
+        # Crawl
+        response = requests.get(url)
+        string = response.content.decode(encoding)
 
-    # Write
-    # file.write(string, file_)
+        # Write
+        file.write(string, file_)
 
     # Read
     string = file.read(file_)

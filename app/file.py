@@ -1,5 +1,22 @@
+import json
+
+
+def dump(data, file, mode='w'):
+    stream = open(file, mode)
+    json.dump(data, stream)
+    stream.close()
+
+
+def load(file):
+    stream = open(file)
+    data = json.load(stream)
+    stream.close()
+
+    return data
+
+
 def read(file):
-    file = open(file, 'r')
+    file = open(file)
 
     return file.read()
 
