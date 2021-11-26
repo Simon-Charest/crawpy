@@ -4,57 +4,65 @@ import requests
 
 
 def main():
-    pid = '26378'
-    url = f'https://www.nosorigines.qc.ca/GenealogieQuebec.aspx?pid={pid}'
-    file_ = f'data/{pid}.htm'
-    encoding = 'windows-1252'
+    directory = 'data/'
+    extension = '.htm'
+    pids = [
+        '1572142',  # Adelard Charest
+        '1572141',  # Alma Tanguay
+        '1713616',  # Joseph Charest
+        '1713617',  # Martine Lebrun
+        '1196958',  # Jean-Baptiste-Celestin Tanguay
+        '1196957',  # Adele Bedard
+        '26378',  # Robert-Mathieu, Choret
+        '26379'  # Sebastienne, Veillon
+    ]
 
-    if not os.path.isfile(file_):
-        # Crawl
-        response = requests.get(url)
-        string = response.content.decode(encoding)
-
-        # Write
-        file.write(string, file_)
-
-    # Read
-    string = file.read(file_)
+    get_files(pids)
 
     first_names = []
     last_names = []
     genders = []
     persons = []
 
-    soup_ = soup.make_soup(string)
+    for p in range(0, len(pids)):
+        # Read
+        file_ = f'{directory}{pids[p]}{extension}'
+        string = file.read(file_)
 
-    # Fetch values
-    pids = soup.find(soup_, 'td', {'class': 'tdlb', 'style': 'width:245px;'})
-    values = soup.find(soup_, 'td', {'class': 'tdl'})
+        # Extract data
+        soup_ = soup.make_soup(string)
 
-    # Current person
-    first_names += soup.find(soup_, 'td', {'class': 'tdlb'}, 'strong')
-    last_names += soup.find(soup_, 'td', {'class': 'tdl', 'style': 'vertical-align:top;'}, 'b')
-    genders += values[1][0]
+        persons.append(
+            {
+                'pid': soup.find(soup_, 'td', {'class': 'tdlb', 'style': 'width:245px;'})[0],
+                'firstName': soup.find(soup_, 'td', {'class': 'tdlb'}, 'strong')[0],
+                'lastName': soup.find(soup_, 'td', {'class': 'tdl', 'style': 'vertical-align:top;'}, 'b')[0],
+                'gender': soup.find(soup_, 'td', {'class': 'tdl'})[1][0],
+                'partner': soup.find(soup_, 'td', {'class': 'tdlb', 'style': 'width:245px;'})[1]
+            }
+        )
 
-    # Partner
-    first_names += soup.find(soup_, 'td', {'class': 'tdlb'}, 'a')
-    last_names += soup.find(soup_, 'td', {'class': 'tdl'}, 'a')
-    genders += values[10][0]
-
-    soup_.clear()
-
-    # Organize values
-    for x in range(0, len(pids)):
-        persons += [{
-            'pid': pids[x],
-            'firstName': first_names[x],
-            'lastName': last_names[x],
-            'gender': genders[x],
-            'partner': pids[1 if x == 0 else 0]
-        }]
+        soup_.clear()
 
     for person in persons:
         print(person)
+
+
+def get_file(pid, file_, url='https://www.nosorigines.qc.ca/GenealogieQuebec.aspx?pid=', encoding='windows-1252'):
+    # Crawl
+    response = requests.get(f'{url}{pid}')
+    string = response.content.decode(encoding)
+
+    # Write
+    file.write(string, file_)
+
+
+def get_files(pids, directory='data/', extension='.htm'):
+    for pid in pids:
+        file_ = f'{directory}{pid}{extension}'
+
+        if not os.path.isfile(file_):
+            get_file(pid, file_)
 
 
 if __name__ == '__main__':
