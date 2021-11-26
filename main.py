@@ -16,12 +16,7 @@ def main():
         '26378',  # Robert-Mathieu, Choret
         '26379'  # Sebastienne, Veillon
     ]
-
     get_files(pids)
-
-    first_names = []
-    last_names = []
-    genders = []
     persons = []
 
     for p in range(0, len(pids)):
@@ -31,7 +26,6 @@ def main():
 
         # Extract data
         soup_ = soup.make_soup(string)
-
         persons.append(
             {
                 'pid': soup.find(soup_, 'td', {'class': 'tdlb', 'style': 'width:245px;'})[0],
@@ -41,7 +35,6 @@ def main():
                 'partner': soup.find(soup_, 'td', {'class': 'tdlb', 'style': 'width:245px;'})[1]
             }
         )
-
         soup_.clear()
 
     for person in persons:
